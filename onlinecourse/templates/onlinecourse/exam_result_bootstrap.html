@@ -50,21 +50,21 @@
         <h5 class="">Exam results</h5>
         {% for question in course.question_set.all %}
         <div class="card mt-1">
-            <div class="card-header"><h5>{{ question.text }}</h5></div>
+            <div class="card-header"><h5>{{ question.content }}</h5></div>
             <div class="card-body">
                 {% for choice in question.choice_set.all %}
                 <p>
                 {% if choice.is_correct %}
                     {% if choice in choices %}
-                    <span class="text-success">Correct answer: {{ choice.text }}</span>
+                    <span class="text-success">Correct answer: {{ choice.content }}</span>
                     {% else %}
-                    <span class="text-warning">Not selected: {{ choice.text }}</span>
+                    <span class="text-warning">Not selected: {{ choice.content }}</span>
                     {% endif %}
                 {% else %}
                     {% if choice in choices %}
-                    <span class="text-danger">Wrong answer: {{ choice.text }}</span>
+                    <span class="text-danger">Wrong answer: {{ choice.content }}</span>
                     {% else %}
-                    {{ choice.text }}
+                    {{ choice.content }}
                     {% endif %}
                 {% endif %}
                 </p>

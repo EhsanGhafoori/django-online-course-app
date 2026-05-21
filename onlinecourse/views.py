@@ -103,22 +103,19 @@ def enroll(request, course_id):
     return HttpResponseRedirect(reverse(viewname='onlinecourse:course_details', args=(course.id,)))
 
 
+# Create a submit view to create an exam submission record for a course enrollment
 def submit(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     user = request.user
     enrollment = Enrollment.objects.get(user=user, course=course, mode='honor')
     submission = Submission.objects.create(enrollment=enrollment)
-
-    for key in request.POST:
-        if key.startswith('choice'):
-            value = request.POST[key]
-            choice_id = int(value)
-            choice = Choice.objects.get(id=choice_id)
-            submission.choices.add(choice)
-
-    return redirect('onlinecourse:show_exam_result', course_id=course_id, submission_id=submission.id)
+    choice_ids = extract_answers(request)
+    choice_objects = Choice.objects.filter(id__in=choice_ids)
+    submission.choices.set(choice_objects)
+    return redirect('onlinecourse:exam_result', course_id=course_id, submission_id=submission.id)
 
 
+# A example method to collect the selected choices from the exam form from the request object
 def extract_answers(request):
     submitted_anwsers = []
     for key in request.POST:
@@ -129,6 +126,7 @@ def extract_answers(request):
     return submitted_anwsers
 
 
+# Create an exam result view to check if learner passed exam and show their question results
 def show_exam_result(request, course_id, submission_id):
     course = get_object_or_404(Course, pk=course_id)
     submission = Submission.objects.get(id=submission_id)
